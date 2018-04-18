@@ -7,8 +7,9 @@ const getLeagueDto = require('./get-dto');
  * @return {*}
  */
 module.exports = (leagues) => {
-    leagues.forEach((league, index) => {
-        leagues[index] = getLeagueDto.map(league);
+    const leaguesDto = leagues;
+    leaguesDto.forEach((league, index) => {
+        leaguesDto[index] = getLeagueDto.map(league);
     });
-    return leagues;
+    return leaguesDto;
 };

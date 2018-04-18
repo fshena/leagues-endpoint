@@ -1,0 +1,340 @@
+openapi: 3.0.0
+
+info:
+  title: Leagues Endpoint
+  version: 1.0.0
+  description: API endpoint for the leagues
+
+servers:
+- url: 'http://api.localleague.local:3000'
+  description: Local development server
+- url: 'http://api.localleague.local:3000'
+  description: Production server
+
+security:
+- BearerAuth: []
+
+paths:
+  /leagues:
+    get:
+      tags:
+      - Leagues
+      summary: Get leagues list
+      description: Get a paginated list of leagues
+      operationId: getLeagues
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+          default: 100
+          maximum: 100
+        required: false
+        description: The number of results returned in the response
+      - in: query
+        name: fields
+        schema:
+          type: string
+          enum:
+            - id
+            - name
+            - description
+            - startDate
+            - endDate
+            - isActive
+        required: false
+        description: A comma separated list of the league's fields to be returned in the response
+      - in: query
+        name: order
+        schema:
+          type: string
+          default: asc
+          enum:
+          - asc
+          - desc
+        required: false
+        description: The order of the returned results
+      - in: query
+        name: sort
+        schema:
+          type: string
+          default: name
+          enum:
+          - id
+          - name
+          - startDate
+          - endDate
+          - is_active
+        required: false
+        description: Sort results by specific league's field
+      responses:
+        '200':
+          description: A full list of leagues
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Link:
+              $ref: '#/components/headers/Link'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/League'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+    post:
+      tags:
+        - Leagues
+      summary: Create league
+      description: Create a new league
+      operationId: postLeagues
+      requestBody:
+        description: An object containing the league's data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/League'
+      responses:
+        '201':
+          description: League succesfully created
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+            Content-Location:
+              $ref: '#/components/headers/Content-Location'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+  /leagues/{leagueId}:
+    get:
+      tags:
+        - Leagues
+      summary: Get a specific league
+      description: Get data for a specific league
+      operationId: getLeaguesById
+      parameters:
+      - in: path
+        name: leagueId
+        required: true
+        schema:
+          type: number
+        description: League ID
+      - in: query
+        name: fields
+        schema:
+          type: string
+          enum:
+            - id
+            - name
+            - description
+            - startDate
+            - endDate
+            - isActive
+        required: false
+        description: A comma separated list of the league's fields to be returned in the response
+      responses:
+        '200':
+          description: A league object
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/League'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+    put:
+      tags:
+        - Leagues
+      summary: Update league
+      description: Replace existing league's data
+      operationId: putLeagues
+      parameters:
+      - in: path
+        name: leagueId
+        required: true
+        schema:
+          type: number
+        description: League ID
+      requestBody:
+        description: An object containing the new league data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/League'
+      responses:
+        '204':
+          description: League successfully updated
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+    delete:
+      tags:
+        - Leagues
+      summary: Delete league
+      description: Delete existing league
+      operationId: deleteLeagues
+      parameters:
+      - in: path
+        name: leagueId
+        required: true
+        schema:
+          type: number
+        description: League ID
+      responses:
+        '204':
+          description: League successfully deleted
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Rate:
+              $ref: '#/components/headers/X-RateLimit-Rate'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+        '304':
+          $ref: '#/components/responses/NOT_MODIFIED'
+        '400':
+          $ref: '#/components/responses/BAD_REQUEST'
+        '401':
+          $ref: '#/components/responses/UNAUTHORIZED'
+        '403':
+          $ref: '#/components/responses/FORBIDDEN'
+        '404':
+          $ref: '#/components/responses/NOT_FOUND'
+        '422':
+          $ref: '#/components/responses/UNPROCESSABLE_ENTITY'
+
+components:
+  schemas:
+    League:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The league identifier
+          example: 123
+        name:
+          type: string
+          pattern: '^[a-zA-Z0-9- ]+$'
+          minLength: 3
+          maxLength: 100
+          description: The league name.
+          example: 'Champions League'
+        description:
+          type: string
+          minLength: 3
+          maxLength: 500
+          description: The league's description.
+          example: Lorem ipsum
+        startDate:
+          type: string
+          description: The league's start date.
+          example:  '2019-07-01T09:59:46.000Z'
+        endDate:
+          type: string
+          description: The league's end date.
+          example: '2019-07-01T09:59:46.000Z'
+        isActive:
+          type: boolean
+          description: A flag defining if the league is active or not.
+          example: false
+      required:
+      - name
+      - startDate
+      - endDate
+      - isActive
+
+  headers:
+    X-RateLimit-Limit:
+      schema:
+        type: integer
+      description: Request limit per specific hour
+    X-RateLimit-Rate:
+      schema:
+        type: number
+      description: Rate of the requests
+    X-RateLimit-Remaining:
+      schema:
+        type: integer
+      description: Remaining request of the 'Limit'
+    Content-Location:
+      schema:
+        type: string
+      description: The link to the newly created company
+    Link:
+      schema:
+        type: string
+      description: 'A link for the next, previous, last and first results set'
+
+  responses:
+    NOT_MODIFIED:
+      description: The entity alredy exists
+    UNAUTHORIZED:
+      description: Not a valid access token
+    UNPROCESSABLE_ENTITY:
+      description: Not a valid company object
+    BAD_REQUEST:
+      description: The request is not valid
+    NOT_FOUND:
+      description: Company was not found
+    FORBIDDEN:
+      description: Not allowed to access entity
+    JWT:
+      description: An object containing a valid JWT
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+tags:
+- name: Leagues
+  description: Everything about a League
+  externalDocs:
+    url: http://docs.my-api.com/pet-operations.htm

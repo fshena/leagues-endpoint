@@ -1,28 +1,27 @@
-const Op = require('sequelize').Op;
-
-const models = require('../../model/index');
-const apiConfig = require('../../../../src/config/api-config');
-const objHelper = require('../../../../src/helper/object-helper');
-const getLeagueDto = require('../../dto/get-dto');
+const { object: objHelper }   = require('@localleague/helpers');
+const { Op }                  = require('sequelize');
+const { query: { maxLimit } } = require('../../config/api-config');
+const models                  = require('../../models');
+const getLeagueDto            = require('../../dto/get-dto');
 
 /**
  * Get specific league entry.
- * @param {Object} req
- * @return {Promise<Array<Model>>}
+ * @param {{leagueId: numeric, fields: array}} payload
+ * @return {Promise<Model>}
  */
-exports.getLeagueById = (req) => {
-    let sqlQuery = {
+exports.getLeagueById = (payload) => {
+    const sqlQuery = {
         where: {
             [Op.and]: {
-                id: req.params.id,
+                id: payload.leagueId,
             },
         },
         raw: true,
     };
-    if (req.params.fields) {
+    if (payload.fields) {
         sqlQuery.attributes = objHelper.getDbFieldsNames(
             getLeagueDto.getMap(),
-            req.params.fields.split(',')
+            payload.fields.split(',')
         );
     }
     return models.League.findOne(sqlQuery);
@@ -34,10 +33,10 @@ exports.getLeagueById = (req) => {
  * @return {Promise<Array<Model>>}
  */
 exports.getAllLeagues = (req) => {
-    let limit = parseInt(req.query.limit) || apiConfig.query.maxLimit;
-    let sqlQuery = {
-        limit: limit,
-        offset: parseInt(req.query.offset) * limit || 0,
+    const limit = parseInt(req.query.limit, 10) || maxLimit;
+    const sqlQuery = {
+        limit,
+        offset: parseInt(req.query.offset, 10) * limit || 0,
         order: [
             [
                 req.query.sort || models.League.attributes.name,
@@ -61,7 +60,6 @@ exports.getAllLeagues = (req) => {
  * @return {Promise<Model, created>}
  */
 exports.createLeague = (newLeague) => {
-    // TODO: Change League identifier
     const conditions = {
         where: {
             [Op.and]: {
@@ -83,7 +81,7 @@ exports.updateLeague = (id, newLeague) => {
     const conditions = {
         where: {
             [Op.and]: {
-                id: id,
+                id,
             },
         },
     };
@@ -99,28 +97,9 @@ exports.deleteLeague = (id) => {
     const conditions = {
         where: {
             [Op.and]: {
-                id: id,
+                id,
             },
         },
     };
     return models.League.destroy(conditions);
-};
-
-/**
- * Update specific fields of a league entry.
- * @param {integer} id
- * @param {Object} data
- * @return {Promise}
- */
-exports.patchLeague = (id, data) => {
-    let attributes = {};
-    attributes[data.path] = data.value;
-    const conditions = {
-        where: {
-            [Op.and]: {
-                id: id,
-            },
-        },
-    };
-    return models.League.update(attributes, conditions);
 };

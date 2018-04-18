@@ -7,12 +7,11 @@ const objMapper = require('object-mapper');
  */
 module.exports = (league) => {
     const src = {
-        'id': 'id',
-        'name': 'name',
-        'description': 'description',
-        'startDate': 'start_date',
-        'endDate': 'end_date',
-        'isActive': 'is_active',
+        name: 'name',
+        description: 'description',
+        startDate: 'start_date',
+        endDate: 'end_date',
+        isActive: 'is_active',
     };
     return objMapper(league, src);
 };
